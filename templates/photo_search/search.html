@@ -7,6 +7,21 @@
                 <h1>Your search query: {{ request.GET.q }}</h1>
             </div>
         </div>
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2>Upload your file with emails:</h2>
+            </div>
+            <div class="form-group mb-3 col-12">
+                <div class="custom-file">
+                    {% csrf_token %}
+                    <input type="file" class="custom-file-input" name="file_input" id="file_input" oninput="input_filename();">
+                    <label id="file_input_label" class="custom-file-label" for="file_input">Select file</label>
+                </div>
+            </div>
+            <div class="col-12"><button type="button" class="btn btn-primary mx-3 mb-3" onclick="upload_file('/upload_file');" id="upload_button">Upload file</button>
+                <div id="alert_place"></div>
+            </div>
+        </div>
         <div class="row justify-content-center">
             {% for image_data in search_result %}
                 <div class="col-2 mt-3 mx-3">
@@ -17,4 +32,57 @@
             {% endfor %}
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        let csrf = document.getElementsByName("csrfmiddlewaretoken")[0];
+
+        function input_filename(){
+            let input = document.getElementById("file_input");
+            let input_label = document.getElementById("file_input_label");
+            input_label.innerHTML = input.files[0].name;
+        }
+
+        function upload_file(url){
+            let input = document.getElementById("file_input");
+
+            if (!input.value) {
+                alert("No file selected", "warning");
+                return false;
+            }
+
+            let data = new FormData();
+            let request = new XMLHttpRequest();
+
+            request.responseType = "json";
+
+            input.disabled = true;
+
+            let file = input.files[0];
+
+            let filesize = file.size;
+
+            document.cookie = `filesize=${filesize};csrftoken=${csrf.value}`;
+            data.append("file", file);
+
+            request.addEventListener("load", (event) =>{
+                if (request.status == 200) {
+                    alert("File uploaded successfully!");
+                } else {
+                    alert("Something went wrong. Try again later");
+                }
+            });
+
+            request.addEventListener("error", (e) => {
+                alert(`Error uploading file`);
+            });
+
+            request.open("post", url);
+
+            request.setRequestHeader("X-CSRFToken", csrf.value);
+
+            request.send(data);
+        }
+    </script>
 {% endblock %}
