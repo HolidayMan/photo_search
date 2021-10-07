@@ -1,5 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {{ request.GET.q }}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Your search query: {{ request.GET.q }}</h1>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            {% for image_data in search_result %}
+                <div class="col-2 mt-3 mx-3">
+                    <div class="card" >
+                        <img class="card-img-top" src="{{ image_data.assets.preview.url }}" alt="Card image cap">
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}
