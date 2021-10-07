@@ -10,6 +10,7 @@ python_version = "3.8"
 
 [packages]
 requests = "*"
+django = "*"
 
 [packages.celery]
 extras = [ "redis",]
